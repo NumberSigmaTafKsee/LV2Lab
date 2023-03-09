@@ -23,6 +23,7 @@
 * Carlo/
 * Core/
 * DspFilters/
+* Spuce/
 * Kfr/
 * Reverb/Synthesizer/
 * AMSynth voice
