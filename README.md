@@ -15,9 +15,16 @@
 * This experimental for loading and testing the lv2 plugins with lua
 
 # Sound Processors swigs/interfaces
-* Analog
-* FX
-* Filters
+* Analog/
+* FX/
+* Filters/
+* BogAudio/
+* Caps/
+* Carlo/
+* Core/
+* DspFilters/
+* Kfr/
+* Reverb/Synthesizer/
 * AMSynth voice
 * AudioFFT
 * AudioSystem
