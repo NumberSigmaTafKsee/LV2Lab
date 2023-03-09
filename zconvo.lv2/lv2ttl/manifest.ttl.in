@@ -1,0 +1,70 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix pset: <http://lv2plug.in/ns/ext/presets#> .
+@prefix zcpset: <http://gareus.org/oss/lv2/@LV2NAME@/pset#> .
+
+<http://gareus.org/oss/lv2/@LV2NAME@#Mono>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#CfgMono>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#Stereo>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#CfgStereo>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#MonoToStereo>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#CfgMonoToStereo>
+	a lv2:Plugin;
+	lv2:binary <@LV2NAME@@LIB_EXT@>;
+	rdfs:seeAlso <@LV2NAME@.ttl>.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#ir>
+	a lv2:Parameter;
+	rdfs:label "Impulse Response";
+	rdfs:range atom:Path.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#gain>
+	a lv2:Parameter;
+	rdfs:label "Signal Level Gain";
+	rdfs:range atom:Float.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#sum_inputs>
+	a lv2:Parameter;
+	rdfs:label "Downmix stereo input (only useful with true-stereo varian)";
+	rdfs:range atom:Bool.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#predelay>
+	a lv2:Parameter;
+	rdfs:label "Pre-delay";
+	rdfs:range atom:Int.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#channel_gain>
+	a lv2:Parameter;
+	rdfs:label "Gain per channel";
+	rdfs:range atom:Vector.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#channel_predelay>
+	a lv2:Parameter;
+	rdfs:label "Pre-delay per channel";
+	rdfs:range atom:Vector.
+
+<http://gareus.org/oss/lv2/@LV2NAME@#artificial_latency>
+	a lv2:Parameter;
+	rdfs:label "Artificial latency to be announced to the host (inverse pre-delay, useful for FIR filters)";
+	rdfs:range atom:Int.

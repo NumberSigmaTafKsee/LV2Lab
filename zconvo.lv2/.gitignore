@@ -1,0 +1,7 @@
+cscope.*
+*.swp
+tags
+
+*.o
+/build
+/tools/fftgain

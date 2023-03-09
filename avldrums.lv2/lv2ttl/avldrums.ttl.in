@@ -1,0 +1,33 @@
+@LV2NAME@:@VARIANT@
+  a doap:Project, lv2:InstrumentPlugin, lv2:Plugin ;
+
+  doap:name "@NAME@" ;
+  rdfs:comment "AVLinux MIDI Drumkit" ;
+
+  doap:maintainer <http://gareus.org/rgareus#me>;
+  doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+
+  @VERSION@
+  @UITTL@
+  @SIGNATURE@
+
+  lv2:requiredFeature urid:map, work:schedule ;
+  lv2:extensionData work:interface, <http://ardour.org/lv2/midnam#interface>;
+  lv2:optionalFeature lv2:hardRTCapable, <http://ardour.org/lv2/midnam#update>;
+
+  lv2:port [
+      a lv2:InputPort, atom:AtomPort ;
+      atom:bufferType atom:Sequence ;
+      atom:supports midi:MidiEvent;
+      lv2:designation lv2:control ;
+      lv2:index 0 ;
+      lv2:symbol "control" ;
+      lv2:name "Midi In" ;
+  ] , [
+      a lv2:OutputPort, atom:AtomPort ;
+      atom:bufferType atom:Sequence ;
+      lv2:designation lv2:control ;
+      lv2:index 1 ;
+      lv2:symbol "notify" ;
+      lv2:name "UI Notifications" ;
+  ] , [

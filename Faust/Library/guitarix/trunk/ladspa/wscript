@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+import os
+
+def configure(conf):
+    pass
+
+def create_ladspa_plugin(bld, source, target, defstr, uselib = None):
+    ladspa_define = target + "=" + defstr
+
+    ladspa_plugin = bld.shlib(
+        defines  = ladspa_define,
+        name     = target,
+        target   = defstr,
+        source   = source,
+        install_path = '${LADSPADIR}',
+        chmod    = 0o755,
+        )
+    ladspa_plugin.env.append_value("CXXFLAGS", ['-fPIC', '-shared'])
+    ladspa_plugin.env.cxxshlib_PATTERN = '%s.so'
+    return ladspa_plugin
+
+
+def build(bld):
+    if not bld.env.LADSPA:
+        return
+
+    sources = [
+        'crybaby.cpp',       
+        'distortion.cpp',
+        'echo.cpp',      
+        'freeverb.cpp',  
+        'impulseresponse.cpp',        
+        'monoamp.cpp',       
+        'monocompressor.cpp',
+        'guitarix-ladspa.cpp'           
+        ] 
+
+    targets = [
+        'crydsp',       
+        'distdsp',
+        'echodsp',      
+        'frdsp',  
+        'irdsp',        
+        'ampdsp',       
+        'comprdsp',
+        'mydsp'            
+        ] 
+
+    defines = [
+        'guitarix_crybaby',       
+        'guitarix_distortion',
+        'guitarix_echo',      
+        'guitarix_freeverb',  
+        'guitarix_IR',        
+        'guitarix_amp',       
+        'guitarix_compressor',
+        'guitarix'            
+        ] 
+
+    for i in range(0, len(sources)):
+        create_ladspa_plugin(bld, sources[i], targets[i], defines[i]) 
+
+    bld.install_files('${SHAREDIR}/ladspa/rdf', 'guitarix.rdf')

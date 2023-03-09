@@ -1,0 +1,78 @@
+[submodule "LDPF-Examples"]
+	path = LDPF-Examples
+	url = https://github.com/LDPF/LDPF-Examples
+[submodule "LDPF"]
+	path = LDPF
+	url = https://github.com/LDPF/LDPF
+[submodule "moony.lv2"]
+	path = moony.lv2
+	url = https://github.com/OpenMusicKontrollers/moony.lv2
+[submodule "lv2"]
+	path = lv2
+	url = https://github.com/swh/lv2
+[submodule "GxPlugins.lv2"]
+	path = GxPlugins.lv2
+	url = https://github.com/brummer10/GxPlugins.lv2
+[submodule "zam-plugins"]
+	path = zam-plugins
+	url = https://github.com/zamaudio/zam-plugins
+[submodule "infamousPlugins"]
+	path = infamousPlugins
+	url = https://github.com/ssj71/infamousPlugins
+[submodule "x42-plugins"]
+	path = x42-plugins
+	url = https://github.com/x42/x42-plugins
+[submodule "rkrlv2"]
+	path = rkrlv2
+	url = https://github.com/ssj71/rkrlv2
+[submodule "caps-lv2"]
+	path = caps-lv2
+	url = https://github.com/moddevices/caps-lv2
+[submodule "wolf-shaper"]
+	path = wolf-shaper
+	url = https://github.com/wolf-plugins/wolf-shaper
+[submodule "mda-lv2"]
+	path = mda-lv2
+	url = https://github.com/moddevices/mda-lv2
+[submodule "mod-distortion"]
+	path = mod-distortion
+	url = https://github.com/moddevices/mod-distortion
+[submodule "wolf-spectrum"]
+	path = wolf-spectrum
+	url = https://github.com/wolf-plugins/wolf-spectrum
+[submodule "ir.lv2"]
+	path = ir.lv2
+	url = https://github.com/Anchakor/ir.lv2
+[submodule "tap-lv2"]
+	path = tap-lv2
+	url = https://github.com/moddevices/tap-lv2
+[submodule "mephisto.lv2"]
+	path = mephisto.lv2
+	url = https://github.com/OpenMusicKontrollers/mephisto.lv2
+[submodule "synthpod"]
+	path = synthpod
+	url = https://github.com/OpenMusicKontrollers/synthpod
+[submodule "Fluida.lv2"]
+	path = Fluida.lv2
+	url = https://github.com/brummer10/Fluida.lv2
+[submodule "ThomannStompenbergDataset"]
+	path = ThomannStompenbergDataset
+	url = https://github.com/MaxPayne86/ThomannStompenbergDataset
+[submodule "aidadsp-lv2"]
+	path = aidadsp-lv2
+	url = https://github.com/AidaDSP/aidadsp-lv2
+[submodule "ams-lv2"]
+	path = ams-lv2
+	url = https://github.com/blablack/ams-lv2
+[submodule "PolyLV2"]
+	path = PolyLV2
+	url = https://github.com/polyeffects/PolyLV2
+[submodule "ModularAmpToolKit.lv2"]
+	path = ModularAmpToolKit.lv2
+	url = https://github.com/brummer10/ModularAmpToolKit.lv2
+[submodule "DISTRHO-Ports"]
+	path = DISTRHO-Ports
+	url = https://github.com/DISTRHO/DISTRHO-Ports
+[submodule "XPlugs.lv2"]
+	path = XPlugs.lv2
+	url = https://github.com/brummer10/XPlugs.lv2

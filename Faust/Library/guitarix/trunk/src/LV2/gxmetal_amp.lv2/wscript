@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+def configure(conf):
+    pass
+
+def build(bld):
+    lv2_base = 'gxmetal_amp'
+
+    bld.lv2(
+        lv2_base = lv2_base,
+        source   = ['gxmetal_amp.cpp'],
+        includes = ['../faust','./', '../DSP', '../DSP/tube_tables'],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['LV2CORE','GX_CONVOLVER','GX_RESAMPLER'],
+        ldscript = 'gxmetal_amp.lds',
+        mapfile = "gxmetal_amp.map",
+        )
+    bld.lv2_gui(
+        lv2_base = lv2_base,
+        source   = ' gxmetal_amp_ui.cpp',
+        includes = ['../xputty/header','../xputty/header/widgets','../xputty/resources',],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['xcairo','X11', 'CAIRO','LV2CORE'],
+        )
+

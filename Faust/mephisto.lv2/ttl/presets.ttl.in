@@ -1,0 +1,129 @@
+# SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+# SPDX-License-Identifier: Artistic-2.0
+
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix pset: <http://lv2plug.in/ns/ext/presets#> .
+@prefix midi: <http://lv2plug.in/ns/ext/midi#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix state: <http://lv2plug.in/ns/ext/state#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix mephisto: <http://open-music-kontrollers.ch/lv2/mephisto#> .
+
+mephisto:bank-filter_through
+	a pset:Preset ;
+	doap:license <https://spdx.org/licenses/Artistic-2.0> ;
+	state:state [
+		mephisto:code """@BANK-FILTER_THROUGH@""" ;
+		mephisto:control_1 "0.0"^^xsd:float ;
+		mephisto:control_2 "0.0"^^xsd:float ;
+		mephisto:control_3 "0.0"^^xsd:float ;
+		mephisto:control_4 "0.0"^^xsd:float ;
+		mephisto:control_5 "0.0"^^xsd:float ;
+		mephisto:control_6 "0.0"^^xsd:float ;
+		mephisto:control_7 "0.0"^^xsd:float ;
+		mephisto:control_8 "0.0"^^xsd:float ;
+		mephisto:control_9 "0.0"^^xsd:float ;
+		mephisto:control_10 "0.0"^^xsd:float ;
+		mephisto:control_11 "0.0"^^xsd:float ;
+		mephisto:control_12 "0.0"^^xsd:float ;
+		mephisto:control_13 "0.0"^^xsd:float ;
+		mephisto:control_14 "0.0"^^xsd:float ;
+		mephisto:control_15 "0.0"^^xsd:float ;
+		mephisto:control_16 "0.0"^^xsd:float ;
+	] .
+
+mephisto:bank-filter_gain
+	a pset:Preset ;
+	doap:license <https://spdx.org/licenses/Artistic-2.0> ;
+	state:state [
+		mephisto:code """@BANK-FILTER_GAIN@""" ;
+		mephisto:control_1 "0.0"^^xsd:float ;
+		mephisto:control_2 "0.0"^^xsd:float ;
+		mephisto:control_3 "0.0"^^xsd:float ;
+		mephisto:control_4 "0.0"^^xsd:float ;
+		mephisto:control_5 "0.0"^^xsd:float ;
+		mephisto:control_6 "0.0"^^xsd:float ;
+		mephisto:control_7 "0.0"^^xsd:float ;
+		mephisto:control_8 "0.0"^^xsd:float ;
+		mephisto:control_9 "0.0"^^xsd:float ;
+		mephisto:control_10 "0.0"^^xsd:float ;
+		mephisto:control_11 "0.0"^^xsd:float ;
+		mephisto:control_12 "0.0"^^xsd:float ;
+		mephisto:control_13 "0.0"^^xsd:float ;
+		mephisto:control_14 "0.0"^^xsd:float ;
+		mephisto:control_15 "0.0"^^xsd:float ;
+		mephisto:control_16 "0.0"^^xsd:float ;
+	] .
+
+mephisto:bank-time_lfo
+	a pset:Preset ;
+	doap:license <https://spdx.org/licenses/Artistic-2.0> ;
+	state:state [
+		mephisto:code """@BANK-TIME_LFO@""" ;
+		mephisto:control_1 "0.0"^^xsd:float ;
+		mephisto:control_2 "0.0"^^xsd:float ;
+		mephisto:control_3 "0.0"^^xsd:float ;
+		mephisto:control_4 "0.0"^^xsd:float ;
+		mephisto:control_5 "0.0"^^xsd:float ;
+		mephisto:control_6 "0.0"^^xsd:float ;
+		mephisto:control_7 "0.0"^^xsd:float ;
+		mephisto:control_8 "0.0"^^xsd:float ;
+		mephisto:control_9 "0.0"^^xsd:float ;
+		mephisto:control_10 "0.0"^^xsd:float ;
+		mephisto:control_11 "0.0"^^xsd:float ;
+		mephisto:control_12 "0.0"^^xsd:float ;
+		mephisto:control_13 "0.0"^^xsd:float ;
+		mephisto:control_14 "0.0"^^xsd:float ;
+		mephisto:control_15 "0.0"^^xsd:float ;
+		mephisto:control_16 "0.0"^^xsd:float ;
+	] .
+
+mephisto:bank-instrument_osc
+	a pset:Preset ;
+	doap:license <https://spdx.org/licenses/Artistic-2.0> ;
+	state:state [
+		mephisto:code """@BANK-INSTRUMENT_OSC@""" ;
+		mephisto:control_1 "0.0"^^xsd:float ;
+		mephisto:control_2 "0.0"^^xsd:float ;
+		mephisto:control_3 "0.0"^^xsd:float ;
+		mephisto:control_4 "0.0"^^xsd:float ;
+		mephisto:control_5 "0.0"^^xsd:float ;
+		mephisto:control_6 "0.0"^^xsd:float ;
+		mephisto:control_7 "0.0"^^xsd:float ;
+		mephisto:control_8 "0.0"^^xsd:float ;
+		mephisto:control_9 "0.0"^^xsd:float ;
+		mephisto:control_10 "0.0"^^xsd:float ;
+		mephisto:control_11 "0.0"^^xsd:float ;
+		mephisto:control_12 "0.0"^^xsd:float ;
+		mephisto:control_13 "0.0"^^xsd:float ;
+		mephisto:control_14 "0.0"^^xsd:float ;
+		mephisto:control_15 "0.0"^^xsd:float ;
+		mephisto:control_16 "0.0"^^xsd:float ;
+	] .
+
+mephisto:bank-analyzer_vu-meter
+	a pset:Preset ;
+	doap:license <https://spdx.org/licenses/Artistic-2.0> ;
+	state:state [
+		mephisto:code """@BANK-ANALYZER_VU-METER@""" ;
+		mephisto:control_1 "0.0"^^xsd:float ;
+		mephisto:control_2 "0.0"^^xsd:float ;
+		mephisto:control_3 "0.0"^^xsd:float ;
+		mephisto:control_4 "0.0"^^xsd:float ;
+		mephisto:control_5 "0.0"^^xsd:float ;
+		mephisto:control_6 "0.0"^^xsd:float ;
+		mephisto:control_7 "0.0"^^xsd:float ;
+		mephisto:control_8 "0.0"^^xsd:float ;
+		mephisto:control_9 "0.0"^^xsd:float ;
+		mephisto:control_10 "0.0"^^xsd:float ;
+		mephisto:control_11 "0.0"^^xsd:float ;
+		mephisto:control_12 "0.0"^^xsd:float ;
+		mephisto:control_13 "0.0"^^xsd:float ;
+		mephisto:control_14 "0.0"^^xsd:float ;
+		mephisto:control_15 "0.0"^^xsd:float ;
+		mephisto:control_16 "0.0"^^xsd:float ;
+	] .

@@ -1,0 +1,3 @@
+[submodule "trunk/webui/bootplate"]
+	path = trunk/webui/bootplate
+	url = https://github.com/enyojs/bootplate.git

@@ -1,0 +1,166 @@
+Documentation for Guitarix Developers
+
+0. Tips for debugging Guitarix
+1. Measurement of DSP processing times
+2. Formatting of source code
+3. Thread architecture
+4. Parameters (for DSP algorithms etc.)
+5. Integration of faust code
+6. LADSPA
+
+0. Tips for debugging Guitarix
+------------------------------
+
+ - waf build dependency computation is a lot faster with python3
+   than with python2
+
+ - building documentation:
+     "RUN_DOXYGEN=run python3 waf"         for fast results
+     "RUN_DOXYGEN=clang,run python3 waf"   yields precise "referenced by" information
+
+     omitting "run" creates build/documentation/Doxyfile, then run with
+     "cd build && doxygen documentation/Doxyfile"
+     View with e.g. "firefox $PWD/html/index.html"
+
+ - recommended build configuration: python3 waf configure --glade
+   --debug --debug enables a lot of extra checks (by not setting
+   -DNDEBUG)
+
+ - if you make changes to libgxw, add --generate-cpp
+
+ - when using gdb it's easier to debug without optimization:
+   --cxxflags-debug '-O0 -g'
+
+ - valgrind can be used when starting guitarix without the jackd
+   server, or when jackd runs with the dummy driver (jackd -ddummy),
+   e.g.: valgrind --leak-check=full guitarix
+
+ - when only working at the user interface (or the backend), another
+   possibility is to separate both parts by starting Guitarix in
+   headless mode and another instance as user interface:
+   terminal 1: guitarix -N
+   terminal 2: guitarix -G -H localhost
+
+ - if glade can't find the gxw support, use tools/gxglade (or do
+   sudo waf install)
+
+ - changes to scss files will be reflected instantly if you start the
+   script tools/run-scss-watch
+
+ - to inspect the internal state of the Gtk widget, use
+   "gsettings set org.gtk.Settings.Debug enable-inspector-keybinding true"
+   and start the inspector window with "Ctrl Shift I" while the mouse
+   pointer is over a widget.
+
+ - there are a lot of Gtk debug options (-> Gtk documentation), which
+   might be available in your Gtk build (like --gtk-debug=icontheme).
+
+ - if you don't find a signal source for testing, one possibility is
+   to build the osci executable from osci.dsp with faust2jack (both in
+   the Faust distribution, Debian packet faust-common). This can be
+   used together with jackd -ddummy to test the software in a
+   virtualized environment (container etc.).
+
+
+1. Measurement of DSP processing times
+----------------------------------------------------------------
+
+Guitarix must be compiled with --debug (specifically NDEBUG not
+defined). Time measurement is switched on by defining the environment
+variable GUITARIX_MEASURE. When setting its value to 1 results are
+more verbose. Results are printed each second on stdout.
+
+For better controlled measurements you can disable frequency scaling
+and set cpu affinity:
+
+$ sudo cpufreq-set -d 800MHz -u 800MHz # or whatever your cpu supports
+$ GUITARIX_MEASURE=1 taskset -c 0 guitarix
+
+
+2. Formatting of source code
+----------------------------------------------------------------
+
+We use emacs c++ style "cc-mode" (other formatters like astyle have
+similar styles under this name) with following modifications:
+
+ - namespaces do not increase indentation
+ - spaces preferred to tabs for indentation
+
+If you use the Emacs editor:
+In ~/.emacs:
+------
+(defconst my-cc-style
+  '("cc-mode"
+    (indent-tabs-mode . nil)
+    (c-offsets-alist . ((innamespace . [0])))))
+(c-add-style "guitarix-cc-mode" guitarix-cc-style)
+--
+In trunk/.dir-locals.el:
+------
+((c++-mode . ((c-file-style . "guitarix-cc-mode") (tab-width . 4)))
+ (c-mode   . ((c-file-style . "guitarix-cc-mode") (tab-width . 4))))
+--
+
+3. Thread architecture
+----------------------------------------------------------------
+
+Basically there are 2 threads:
+
+ - the main thread for all work (especially all user interface)
+   except audio processing
+
+ - the jack rt thread for audio processing in the process() callback
+   in hard real time (as "hard" as available..). The jack notification
+   callbacks have more relaxed time constraints and may be executed in
+   another thread created by libjack (depends on if you are using
+   jack1 or jack2).
+
+All other threads are just waiting for some semaphore or process
+signal and delegate their work to the main thread via g_idle_add (this
+is safe because the glib main loop data structures are protected by a
+mutex).
+
+An exception is the library for the zita convolver, which creates rt
+threads to spread the work for convolution processing. But this is
+internal to the library.
+
+At some places in the program g_idle and g_timeout callbacks are
+called threads, but these are running synchronous in the main loop and
+are not meant here (on MP systems the main thread can even run
+simultaneously with the rt thread).
+
+
+4. Parameters (for DSP algorithms etc.)
+----------------------------------------------------------------
+
+All parameters have a unique string id. Its a path notation of group,
+subgroup(s) and name separated by ".".
+
+There is a base type (Parameter) and a central registry
+(ParamMap) for all parameters. Parameters have a user-visible
+group and name (e.g. when you set the midi controller for a
+parameter) and a description, and can be defined in faust dsp code.
+
+Registered parameters are saved into the application settings file and
+possibly into preset files (depending on a flag in the parameter
+definition).
+
+
+5. Integration of faust code
+----------------------------------------------------------------
+
+Since faust code (http://faust.grame.fr ) is quite legible, but not so
+the generated c++ code, its a good idea to work with the faust code
+directly. This could be done by using the faust generated c++ objects
+(and quite some runtime shuffling), but we are using the python script
+tools/dsp2cc to post-process the faust output (giving some more
+control at the expense of being a bit more faust version dependent).
+
+Faust dsp files are in src/faust, the generated files get copied to
+src/faust-cc for distribution so the program can be build later even
+if faust is not installed (or no compatible version).
+
+6. LADSPA
+----------------------------------------------------------------
+
+Guitarix has been allocated the range 4061 - 4099 for LADSPA UniqueID's.

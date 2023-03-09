@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+# SPDX-License-Identifier: Artistic-2.0
+
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
+@prefix opts: <http://lv2plug.in/ns/ext/options#> .
+@prefix log: <http://lv2plug.in/ns/ext/log#> .
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
+
+@prefix mephisto:	<http://open-music-kontrollers.ch/lv2/mephisto#> .
+
+mephisto:ui
+	ui:portNotification [
+		ui:plugin mephisto:audio_1x1;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:audio_2x2;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:audio_4x4;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:audio_8x8;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:cv_1x1 ;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:cv_2x2 ;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:cv_4x4 ;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] , [
+		ui:plugin mephisto:cv_8x8 ;
+		lv2:symbol "notify" ;
+		ui:protocol atom:eventTransfer ;
+	] ;
+	lv2:requiredFeature ui:idleInterface, urid:map, ui:parent ;
+	lv2:optionalFeature ui:requestValue, opts:options, log:log ;
+	opts:supportedOption ui:scaleFactor ;
+	#opts:requiredOption param:sampleRate ;
+	lv2:extensionData ui:idleInterface .

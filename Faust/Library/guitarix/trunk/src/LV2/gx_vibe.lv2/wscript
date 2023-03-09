@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+def configure(conf):
+    pass
+
+def build(bld):
+    lv2_base = 'gx_vibe'
+
+    bld.lv2(
+        lv2_base = lv2_base,
+        source   = ['gx_vibe.cpp'],
+        includes = ['../faust','./', '../DSP'],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['LV2CORE','GX_RESAMPLER'],
+        )
+    bld.lv2_gui(
+        lv2_base = lv2_base,
+        source   = ' gx_vibe_ui.cpp',
+        includes = ['../xputty/header','../xputty/header/widgets','../xputty/resources', '../xputty/lv2_plugin'],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['xcairo','X11', 'CAIRO','LV2CORE'],
+        )

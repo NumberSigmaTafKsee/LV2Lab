@@ -1,0 +1,24 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: d2tk
+Upstream-Contact: Hanspeter Portner <dev@open-music-kontrollers.ch>
+Source: https://git.open-music-kontrollers.ch/lad/d2tk/
+
+Files: pugl/*
+Copyright: David Robillard <d@drobilla.net>
+License: ISC
+
+Files: linenoise/*
+Copyright: Salvatore Sanfilippo <antirez@gmail.com>
+License: BSD-2-Clause
+
+Files: nanovg/*
+Copyright: Mikko Mononen <memon@inside.org>
+License: Zlib
+
+Files: utf8.h/*
+Copyright: Neil Henning <github.com/sheredom/utf8.h>
+License: Unlicense
+
+Files: src/mum.h
+Copyright: 2016, 2017, 2018 Vladimir Makarov <vmakarov@gcc.gnu.org>
+License: MIT

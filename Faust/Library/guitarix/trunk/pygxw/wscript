@@ -1,0 +1,86 @@
+# -*- python -*-
+# -*- coding: utf-8 -*-
+
+from waflib import Logs, Options
+
+def options(opt):
+    grp = opt.get_option_group("Guitarix Widget Library")
+    grp.add_option('--python-wrapper',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('build python wrapper for library (Developers only!!)'),
+                   )
+
+def configure(conf):
+    if not Options.options.python_wrapper:
+        return
+    conf.env.GX_PYTHON_WRAPPER = True
+    conf.env.GXW_SHARED = True
+    conf.env.GXW_SHARED_INSTALL = True
+    conf.load('python')
+    conf.check_python_headers(features='pyext')
+    if conf.env.PYTHON_VERSION[0] != '3':
+        raise conf.errors.WafError(
+            'need Python version 3; please use "python3 waf configure ..."'
+            ' or supply the executable path in environment variable PYTHON')
+    conf.check_python_module("numpy")
+    conf.check_cfg(package='pygobject-2.0', args='--cflags --libs', uselib_store='PYGOBJECT', mandatory=True)
+    conf.check_cfg(package='pygobject-2.0', variables='codegendir', uselib_store='PYGOBJECT', mandatory=True, quiet=True)
+    conf.check_cfg(package='pygtk-2.0', args='--cflags --libs', uselib_store='PYGTK', mandatory=True)
+    conf.check_cfg(package='pygtk-2.0', variables='defsdir', uselib_store='PYGTK', mandatory=True, quiet=True)
+    conf.check_cfg(package='gobject-introspection-1.0', mandatory=True)
+    conf.find_program('g-ir-scanner', mandatory=True)
+    conf.find_program('g-ir-compiler', mandatory=True)
+
+def build(bld):
+    if not bld.env.GX_PYTHON_WRAPPER:
+        return
+    bld.add_group()
+    sources = ["GxTuner.h",
+               "GxFastMeter.h",
+               "GxWaveView.h",
+               "GxRegler.h",
+               "GxSelector.h",
+               "GxSwitch.h",
+               "GxToggleImage.h",
+               "GxControlParameter.h",
+               "GxIREdit.h",
+               "GxRadioButton.h",
+               "GxWheel.h",
+               "GxWheelVertical.h",
+               "GxKnob.h",
+               "GxBigKnob.h",
+               "GxSmallKnob.h",
+               "GxSmallKnobR.h",
+               "GxHSlider.h",
+               "GxMiniSlider.h",
+               "GxVSlider.h",
+               "GxEQSlider.h",
+               "GxLevelSlider.h",
+               "GxPaintBox.h",
+               "GxMeterScale.h",
+               "GxValueDisplay.h",
+               "GxRackTuner.h",
+               ]
+    glob = lambda n: bld.srcnode.ant_glob('libgxw/gxw/'+n)
+    bld.env.LIBRARY='libgxw/gxw/libgxw.so'
+    gir_name = "Gxw-0.1.gir"
+    bld(name = 'gxw_gir',
+        rule = (
+            "g-ir-scanner --namespace=Gxw --nsversion=0.1 --library ${LIBRARY}"
+	    "  --symbol-prefix=gx_ --symbol-prefix=gxw_ --identifier-prefix=Gx"
+	    "  $(pkg-config gtk+-3.0 --cflags --libs)"
+	    "  -Llibgxw/gxw -lgxw"
+	    "  --include Gtk-3.0"
+	    "  --output=${TGT}"
+            "  ${SRC}"
+            ),
+        source = glob('gxinit.*')+glob('Gx*.cpp')+glob('Gx*.h'),
+        target = gir_name,
+        )
+    bld(name = 'gxw_typelib',
+        rule = 'g-ir-compiler ${SRC} --output=${TGT}',
+        source = gir_name,
+        target = gir_name.replace('.gir','.typelib'),
+        )

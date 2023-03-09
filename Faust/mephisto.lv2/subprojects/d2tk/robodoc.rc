@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+# SPDX-License-Identifier: CC0-1.0
+
+items:
+	SUMMARY
+	SYNOPSIS
+	FUNCTION
+	INPUTS
+	OUTPUT
+	SEE ALSO
+source items:
+	SYNOPSIS
+remark begin markers:
+	/*
+remark end markers:
+	*/

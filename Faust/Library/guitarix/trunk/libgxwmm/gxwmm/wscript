@@ -1,0 +1,296 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+from waflib import Task, Options, Logs
+from waflib.TaskGen import extension
+import shutil, os
+
+def options(opt):
+    grp = opt.add_option_group("Guitarix Widget Library")
+    grp.add_option('--shared-lib',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('build shared library'),
+                   )
+    grp.add_option('--static-lib',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('build static library'),
+                   )
+    grp.add_option('--lib-dev',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('install shared library headers'),
+                   )
+    grp.add_option('--no-ldconfig',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('dont run ldconfig'),
+                   )
+    grp.add_option('--generate-cpp-wrapper',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('re-generate the pre-built c++ library wrapper files (Developers only!!)'),
+                   )
+    grp.add_option('--generate-resources',
+                   action='store_const',
+                   default=False,
+                   const=True,
+                   help=('re-generate the pre-built gresources file (Developers only!!)'),
+                   )
+
+def configure(conf):
+    opt = conf.options
+    env = conf.env
+    if opt.generate_cpp_wrapper:
+        conf.check_cfg(package='glibmm-2.4', variables='gmmprocdir', uselib_store='GLIBMM', mandatory=True)
+        conf.check_cfg(package='gtkmm-3.0', variables='gmmprocm4dir', uselib_store='GTK', mandatory=True)
+        conf.check_cfg(package='atkmm-1.6', variables='gmmprocm4dir', uselib_store='ATK', mandatory=True)
+        conf.check_cfg(package='pangomm-1.4', variables='gmmprocm4dir', uselib_store='PANGO', mandatory=True)
+        env.USE_GENERATED_CPP = False
+    else:
+        env.USE_GENERATED_CPP = True
+    if opt.shared_lib or opt.standalone:
+        env.GX_LIB_SHARED = True
+    if opt.static_lib :
+        env.GX_LIB_SHARED = False
+        env.GX_LIB_DEV = False
+        env.GX_LIB_STATIC = True
+    if opt.lib_dev:
+        env.GX_LIB_SHARED = True
+        env.GX_LIB_DEV = True
+        env.GX_LIB_STATIC = False
+    if opt.no_ldconfig or opt.destdir:
+        env.NO_LDCONFIG = True
+
+
+def template2cc(task):
+    src = task.inputs[0]
+    dst = task.outputs[0]
+    env = task.env
+    basename = os.path.splitext(src.name)[0]
+    dst.delete(evict=False)
+    private = dst.parent.make_node('private')
+    private.mkdir()
+    spath = src.parent.bldpath()
+    dpath = dst.parent.bldpath()
+    cmd = ["%s/gmmproc" % env.GLIBMM_gmmprocdir,
+           "--defs", dpath,
+           "-I", spath,
+           "-I", "%s" % env.GTK_gmmprocm4dir,
+           "-I", "%s" % env.ATK_gmmprocm4dir,
+           "-I", "%s" % env.PANGO_gmmprocm4dir,
+           basename,
+           spath,
+           dpath,
+           ]
+    ret = task.exec_command(cmd, shell=False)
+    if ret != 0:
+        return ret
+    generated_dir = src.parent.parent.make_node('gxwmm-generated')
+    generated = generated_dir.make_node(basename).abspath()
+    try:
+        shutil.copy2(dst.abspath(), generated+".cc")
+        shutil.copy2(dst.change_ext('.h').abspath(), generated+".h")
+        shutil.copy2(private.find_node(basename+"_p.h").abspath(),
+                     generated_dir.make_node(['private',basename+'_p.h']).abspath())
+    except (OSError, IOError) as e:
+        Logs.error("runner: cannot copy file -> %s" % e)
+        return e.errno
+    return 0
+
+Task.task_factory(
+    'gmmproc',
+    template2cc,
+    color='BLUE',
+    )
+
+@extension('.hg')
+def process_hg(self, node):
+        cc_node = node.change_ext('.cc')
+        h_node = node.change_ext('.h')
+        task = self.create_task('gmmproc', [node], [cc_node, h_node])
+        task.after = ["gxwdefs"]
+        task.dep_nodes.append(
+            node.parent.find_resource(node.name.replace('.hg','.ccg')))
+        task.dep_nodes.append(
+            node.parent.find_or_declare('gxw.defs'))
+        self.source.append(cc_node)
+
+def header2defs(task):
+    sources = " ".join(["'%s'" % v.bldpath() for v in task.inputs[1:]])
+    path = task.generator.path
+    dst = task.outputs[0].bldpath()
+    flt = task.inputs[0].bldpath()
+    cmd = ("python3 ../libgxwmm/gxwmm/tools/h2def.py -f '%s' -m gxw %s > '%s'"
+           % (flt, sources, dst))
+    return task.exec_command(cmd, shell=True)
+
+def build_generate_wrapper(bld):
+    header = ["GxTuner.h",
+              "GxRackTuner.h",
+              "GxFastMeter.h",
+              "GxWaveView.h",
+              "GxRegler.h",
+              "GxSelector.h",
+              "GxSwitch.h",
+              "GxToggleImage.h",
+              "GxControlParameter.h",
+              "GxIREdit.h",
+              "GxRadioButton.h",
+              "GxWheel.h",
+              "GxWheelVertical.h",
+              "GxKnob.h",
+              "GxBigKnob.h",
+              "GxMidKnob.h",
+              "GxSmallKnob.h",
+              "GxSmallKnobR.h",
+              "GxHSlider.h",
+              "GxMiniSlider.h",
+              "GxVSlider.h",
+              "GxEQSlider.h",
+              "GxLevelSlider.h",
+              "GxPaintBox.h",
+              "GxMeterScale.h",
+              "GxValueDisplay.h",
+              "GxSimpleValueDisplay.h",
+              "GxPortDisplay.h",
+              "GxPlayHead.h",
+              ]
+    header = ["../../libgxw/gxw/"+v for v in header]
+    bld.program(
+        source = "generate_defs_gxw.cc",
+        use = ['GTKMM','gxw'],
+        lib    = 'glibmm_generate_extra_defs-2.4',
+        target = 'generate_defs_gxw',
+        install_path = None,
+        )
+    bld.add_group()
+    libdir = bld.bldnode.find_or_declare("libgxw/gxw").bldpath()
+    e1 = 's/GdkEvent\\*/GdkEventButton*/'
+    e2 = 's/return-type "const-gchar\\*"/return-type "gchar*"/'
+    bld(name = "sigdefs",
+        rule = ("LD_LIBRARY_PATH=\"%s\" ${SRC} | sed -e '"+e1+"' -e '"+e2+"'> ${TGT}") % libdir,
+        source = 'generate_defs_gxw',
+        target = 'signals.defs',
+        )
+    bld(name = "mthdefs",
+        rule = header2defs,
+        source = ['filter.defs']+header,
+        target = "methods.defs",
+        )
+    bld(name = "enumdefs",
+        rule = bld.path.find_node('enum.pl').abspath()+" ${SRC} > ${TGT}",
+        source = header,
+        target = "enum.defs",
+        )
+    bld(name = "gxwdefs",
+        rule = 'for f in ${SRC}; do echo "(include $(basename $f))"; done > ${TGT}',
+        source = ["methods.defs","signals.defs","enum.defs"],
+        target = "gxw.defs",
+        after = ["sigdefs","mthdefs","enumdefs"],
+        )
+    bld(rule = "cp ${SRC} ${TGT}",
+        source = "docs.xml",
+        target = "gxw_docs.xml",
+        )
+
+def build(bld):
+    sources = [
+        "controlparameter.hg",
+        "switch.hg",
+        "regler.hg",
+        "knob.hg",
+        "bigknob.hg",
+        "midknob.hg",
+        "smallknob.hg",
+        "smallknobr.hg",
+        "tuner.hg",
+        "racktuner.hg",
+        "fastmeter.hg",
+        "waveview.hg",
+        "selector.hg",
+        "toggleimage.hg",
+        "iredit.hg",
+        "radiobutton.hg",
+        "wheel.hg",
+        "wheelvertical.hg",
+        "hslider.hg",
+        "minislider.hg",
+        "vslider.hg",
+        "eqslider.hg",
+        "levelslider.hg",
+        "paintbox.hg",
+        "meterscale.hg",
+        #"gradient.hg",
+        "valuedisplay.hg",
+        "simplevaluedisplay.hg",
+        "portdisplay.hg",
+        "playhead.hg",
+        ]
+    env = bld.env
+    bld(name='gxwmm_inc', export_includes=['..'], use='gxw_inc')
+    if not env.GX_LIB_SHARED and not env.GX_LIB_STATIC:
+        return
+    bld.add_group()
+    if env.USE_GENERATED_CPP:
+        gdir = "../gxwmm-generated/"
+        for v in sources:
+            v = os.path.splitext(v)[0]
+            for s in v+".cc", v+".h", "private/"+v+"_p.h":
+                bld(name = "copy-generated-cc",
+                    rule = "cp ${SRC} ${TGT}",
+                    source = gdir + s,
+                    target = s,
+                )
+        bld(name = "copy-wrap_init",
+            rule = "cp ${SRC} ${TGT}",
+            source = gdir + "wrap_init.cc",
+            target = 'wrap_init.cc',
+            )
+        sources = [v.replace(".hg",".cc") for v in sources]
+    else:
+        bld(name = "wrap_init",
+            rule = "${GLIBMM_gmmprocdir}/generate_wrap_init.pl --namespace=Gxw ${SRC} >${TGT}; cp ${TGT} ../libgxwmm/gxwmm-generated",
+            source = sources,
+            target = "wrap_init.cc",
+            )
+        build_generate_wrapper(bld)
+    if env.GX_LIB_SHARED:
+        bld.shlib(
+            name = 'gxwmm',
+            vnum = "0.1",
+            includes = ['..'],
+            export_includes = ['..'],
+            source = sources+["init.cc","wrap_init.cc"],
+            use = ['GTKMM','gxw'],
+            target = 'gxwmm',
+            )
+        if not env.NO_LDCONFIG:
+            if bld.is_install and not Options.options.destdir \
+               and not Options.options.no_ldconfig and os.geteuid() == 0:
+                bld.add_post_fun_ignore_errors(
+                    lambda ctx: ctx.exec_command('/sbin/ldconfig'))
+    else:
+        bld.stlib(
+            name = 'gxwmm',
+            includes = ['..'],
+            export_includes = ['..'],
+            source = sources+["init.cc","wrap_init.cc"],
+            use = ['GTKMM','gxw'],
+            target = 'gxwmm',
+            )
+    if "RUN_DOXYGEN" in os.environ:
+        # save source file list and include paths for use by doxygen
+        bld(rule="echo ${SRC} > ${TGT}",
+            source = (["init.cc","wrap_init.cc"] +
+                      [v.replace('.hg','.h') for v in sources] +
+                      [v.replace('.hg','.cc') for v in sources]),
+                      #['private/'+v.replace('.hg','_p.h') for v in sources]),
+            target = 'input_libgxwmm.txt',
+            )

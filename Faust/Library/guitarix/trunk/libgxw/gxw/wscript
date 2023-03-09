@@ -1,0 +1,115 @@
+# -*- python -*-
+# -*- coding: utf-8 -*-
+
+from waflib import Logs, Utils, Configure, Options
+import os, shutil
+
+def options(opt):
+    pass
+
+def configure(conf):
+    pass
+
+def img2c(task):
+    src = task.inputs[0].bldpath()
+    dstnode = task.outputs[0]
+    dst = dstnode.abspath()
+    cpy = dstnode.parent.parent.get_src().abspath()
+
+    cmd = ("glib-compile-resources --sourcedir=../libgxw/icons/ --target=%s  --generate-source %s" % (dst, src))
+    Logs.debug("runner: system command -> %s" % cmd)
+    ret = task.exec_command(cmd, shell=True)
+    shutil.copy2(dst,cpy)
+    return ret
+
+def build_stock_images(bld):
+
+    # generate gresourcefile from resources.xml, to add images add them in
+    # gxinit.cpp and ../resources.xml, then use the --generate-resources flag
+    # to re-generate the gximages.cc file
+
+    if bld.env["HAVE_GLIB"]:
+        bld(name = "generate-resources",
+            target = "gximages.cc",
+            rule = img2c,
+            source = "../resources.xml",
+            )
+    else:
+        bld(name = "copy-resources",
+            rule = "cp ${SRC} ${TGT}",
+            source = "../gximages.cc",
+            target = 'gximages.cc',
+            )
+    bld.add_group()
+
+def build(bld):
+    if not (bld.env.STANDALONE or bld.env.NEW_LADSPA or bld.env.GX_PYTHON_WRAPPER or bld.env.GX_GLADE_SUPPORT):
+        return
+
+    sources = [
+        'gxinit.cpp',
+        'drawingutils.cpp',
+        'GxFastMeter.cpp',
+        'GxWaveView.cpp',
+        'GxTuner.cpp',
+        'GxRegler.cpp',
+        'GxSelector.cpp',
+        'GxSwitch.cpp',
+        'GxToggleImage.cpp',
+        'GxControlParameter.cpp',
+        'GxIREdit.cpp',
+        'GxRadioButton.cpp',
+        'GxWheel.cpp',
+        'GxWheelVertical.cpp',
+        'GxKnob.cpp',
+        'GxBigKnob.cpp',
+        'GxMidKnob.cpp',
+        'GxSmallKnob.cpp',
+        'GxSmallKnobR.cpp',
+        'GxHSlider.cpp',
+        'GxMiniSlider.cpp',
+        'GxVSlider.cpp',
+        'GxEQSlider.cpp',
+        'GxLevelSlider.cpp',
+        'GxPaintBox.cpp',
+        'GxMeterScale.cpp',
+        'GxValueDisplay.cpp',
+        'GxSimpleValueDisplay.cpp',
+        'GxRackTuner.cpp',
+        'GxPortDisplay.cpp',
+        'GxPlayHead.cpp',
+        ]
+    build_stock_images(bld)
+    if bld.env["GX_LIB_STATIC"]:
+        # static library
+        prog = bld.stlib(
+            includes = ['.'],
+            export_includes = ['..'],
+            source = sources,
+            use = ['GTHREAD', 'GTK2'],
+            target = 'gxw',
+            chmod=0o755,
+            )
+    if bld.env["GX_LIB_SHARED"] or bld.env["GXW_SHARED"]:
+        # shared library
+        prog = bld.shlib(
+            includes = ['.'],
+            export_includes = ['..'],
+            source = sources,
+            use = ['GTHREAD', 'GTK2'],
+            target = 'gxw',
+            chmod=0o755,
+            )
+        if bld.env["GX_LIB_SHARED"] or bld.env["GXW_SHARED_INSTALL"]:
+            prog.type = 'cshlib'
+            prog.vnum = "0.1"
+        else:
+            prog.install_path = None
+
+    bld(name='gxw_inc', export_includes=['..'])
+    if "RUN_DOXYGEN" in os.environ:
+        # save source file list and include paths for use by doxygen
+        bld(rule="echo ${SRC} > ${TGT}",
+            source = sources,
+            target = 'input_libgxw.txt',
+            )

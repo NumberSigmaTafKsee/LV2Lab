@@ -1,0 +1,15 @@
+Source: guitarix2
+Section: sound
+Priority: extra
+Maintainer: brummer <brummer-@web.de>
+Build-Depends: debhelper (>= 6), python3|python2.5|python2.6|python2.7, libjack-jackd2-dev|libjack-dev, libsndfile1-dev, libgtk-3-dev, libgtkmm-3.0-dev, ladspa-sdk, libavcodec-dev, libavutil-dev, liblilv-dev, lv2-dev, libeigen3-dev, libavahi-gobject-dev, libfftw3-dev, liblrdf0-dev, libsndfile1-dev, libsigc++-2.0-dev, libboost-system-dev, libboost-iostreams-dev, gperf
+Standards-Version: 3.7.3
+Homepage: <http://guitarix.org/>
+
+Package: guitarix2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: jack-capture, vorbistools, lame
+Description: <simple mono amplifier>
+ <Guitarix is a rock guitar amplifier for the JACK Audio Connection Kit with one input and two outputs.>
+ 

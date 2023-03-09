@@ -1,0 +1,225 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+import sys
+from waflib import Task, Options, Logs
+from waflib.TaskGen import extension
+import os, shutil
+
+def options(opt):
+    guitarix_prog = opt.add_option_group("Guitarix Program Options")
+    guitarix_prog.add_option(
+        '--no-avahi', action='store_const', default=False, const=True,
+        help=('Do not build with avahi support for automatic discovery of'
+              ' / connection to Guitarix server instances  [Default: no]'))
+    guitarix_prog.add_option(
+        '--no-bluez', action='store_const', default=False, const=True,
+        help=('Do not build with bluez support for remote'
+              ' / connection to Guitarix server instances  [Default: no]'))
+    guitarix_prog.add_option(
+        '--no-nsm', action='store_const', default=False, const=True,
+        help=('Do not build with nsm support for remote'
+              ' / connection to NSM server instances  [Default: no]'))
+    guitarix_prog.add_option(
+        '--jack-session', action='store_const', default=False, const=True,
+        help=('Try to build with jack session support  [Default: no]'))
+
+def configure(conf):
+    if not Options.options.no_avahi:
+        conf.check_cfg(package='avahi-gobject', args='--cflags --libs', uselib_store='AVAHI_GOBJECT', mandatory=1)
+        conf.check_cfg(package='avahi-glib', args='--cflags --libs', uselib_store='AVAHI_GLIB', mandatory=1)
+        conf.check_cfg(package='avahi-client', args='--cflags --libs', uselib_store='AVAHI_CLIENT', mandatory=1)
+        conf.env.HAVE_AVAHI = 1
+        conf.define("HAVE_AVAHI", 1)
+    if not Options.options.no_bluez:
+        conf.check_cfg(package='bluez', args='--cflags --libs', uselib_store='BLUEZ', mandatory=0)
+    if not Options.options.no_nsm:
+        conf.check_cfg(package='liblo', args='--cflags --libs', uselib_store='LIBLO', mandatory=0)
+
+def gperf2cc(task):
+    def generated(node):
+        name = node.name.replace('.','-generated.')
+        return node.parent.find_or_declare([name]).get_src().abspath()
+    if task.env.HAVE_GPERF:
+        # task.proc.bldpath() triggers bug in Waf 2.0.19 when logging is active
+        cmd = [task.proc.abspath()] + [n.bldpath() for n in task.inputs + task.outputs]
+        Logs.debug("runner: system command -> %s" % cmd)
+        ret = task.exec_command(cmd, shell=False)
+        for out in task.outputs:
+            shutil.copy2(out.abspath(), generated(out))
+        return ret
+    else:
+        for out in task.outputs:
+            shutil.copy2(generated(out), out.abspath())
+        return 0
+
+Task.task_factory(
+    'gperf',
+    gperf2cc,
+    color='BLUE',
+    before='cxx',
+    )
+
+@extension('.gperf_tmpl')
+def process_gperf_tmpl(self, node):
+    cc_node = node.change_ext('.cc')
+    h_node = node.change_ext('.h')
+    task = self.create_task('gperf', [node], [cc_node, h_node])
+    p = "tools/make_jsonrpc_methods"
+    task.proc = self.bld.srcnode.find_resource(p)
+    self.bld.add_manual_dependency(node, task.proc)
+
+def build(bld):
+    if not (bld.env.STANDALONE or bld.env.NEW_LADSPA):
+        return
+
+    sources_engine_shared = [
+        'engine/gx_json.cpp',
+        'engine/gx_faust_plugins.cpp',
+        'engine/gx_internal_plugins.cpp',
+        'engine/gx_engine_audio.cpp',
+        'engine/gx_paramtable.cpp',
+        'engine/gx_convolver.cpp',
+        'engine/gx_resampler.cpp',
+        'engine/gx_system.cpp',
+        'engine/gx_logging.cpp',
+        'engine/gx_pluginloader.cpp',
+        ]
+    sources_engine = [
+        './engine/ladspaplugin.cpp',
+        './engine/ladspaback.cpp',
+        './engine/tunerswitcher.cpp',
+        './engine/jsonrpc.cpp',
+        './engine/gx_jack.cpp',
+        './engine/gx_preset.cpp',
+        './engine/gx_internal_ui_plugins.cpp',
+        './engine/gx_pitch_tracker.cpp',
+        './engine/gx_engine.cpp',
+        './engine/jsonrpc_methods.gperf_tmpl',
+        ]
+
+    sources_gui = [
+        './gui/machine.cpp',
+        './gui/ladspalist.cpp',
+        './gui/gx_stackbox_builder.cpp',
+        './gui/gx_main_window.cpp',
+        './gui/liveplay.cpp',
+        './gui/rack.cpp',
+        './gui/gx_preset_window.cpp',
+        './gui/gx_jack_options.cpp',
+        './gui/gx_ui_builder.cpp',
+        './gui/gx_gui_helpers.cpp',
+        './gui/gx_child_process.cpp',
+        './gui/gx_main_midi.cpp',
+        './gui/gx_jconv_settings.cpp',
+        './gui/gx_sequencer_settings.cpp',
+        './gui/gxw_mm_controllers.cpp',
+        './gui/gx_main_boxes.cpp',
+        './gui/gx_portmap.cpp',
+        './gui/gx_main.cpp',
+        ]
+
+    builder_files = [
+        './builder/midi.glade',
+        './builder/midi_channel.glade',
+        './builder/ports.glade',
+        './builder/iredit.glade',
+        './builder/iredit_mono.glade',
+        './builder/jackstarter.glade',
+        './builder/mainpanel.glade',
+        './builder/ampbox.glade',
+        './builder/liveplay.glade',
+        './builder/ladspaliste.glade',
+        './builder/crybaby_ui.glade',
+        './builder/wah_ui.glade',
+        './builder/vibe_ui.glade',
+        './builder/vibe_stereo_ui.glade',
+        './builder/reversedelay_ui.glade',
+        './builder/gx_distortion_ui.glade',
+        './builder/gx_record_ui.glade',
+        './builder/gx_st_record_ui.glade',
+        './builder/gx_detune_ui.glade',
+        './builder/abgate_ui.glade',
+        './builder/amp.tonestack_ui.glade',
+        './builder/ampimpulse_ui.glade',
+        './builder/ampimpulse_st_ui.glade',
+        './builder/cabinet_ui.glade',
+        './builder/cabinet_stereo_ui.glade',
+        './builder/jconv_ui.glade',
+        './builder/jconv_st_ui.glade',
+        './builder/oscilloscope_ui.glade',
+        './builder/drumsequencer_ui.glade',
+        './builder/dubber_ui.glade',
+        './builder/metronome_ui.glade',
+        './builder/tremolo_ui.glade',
+        './builder/pluginpreset_inputwindow.glade',
+        './builder/pluginpreset_listwindow.glade',
+        './builder/pluginpreset_connectwindow.glade',
+        './builder/selectinstance.glade',
+        './builder/Sequencer.glade',
+        './builder/vumeter_ui.glade',
+        './builder/vumeter_st_ui.glade',
+        './builder/poweramps_ui.glade',
+        './builder/menu.ui',
+        './builder/gx_plugins.png',
+        './builder/gx_rack.png',
+        './builder/gx_show.png',
+        './builder/gx_split.png',
+        './builder/gx_tuner.png',
+        './builder/gx_config.png',
+        './builder/gx_fold.png',
+        './builder/gx_fullscreen.png',
+        ]
+
+    incl = ['.','./engine','./engine/tabels','../..','..','../headers'] # need ".." for config.h
+
+    if bld.env.NEW_LADSPA:
+        bld(name = 'shared_engine',
+            features='cxx',
+            cxxflags = bld.env.CXXFLAGS_cxxshlib + ['-DNEW_LADSPA', '-fvisibility=hidden'],
+            source = sources_engine_shared,
+            includes = incl,
+            use = ['GLIBMM','GIOMM','LILV','gxwmm_inc','ZITA_CONVOLVER','ZITA_RESAMPLER'],
+            )
+
+    if not bld.env.STANDALONE:
+        return
+
+    if bld.env.HAVE_AVAHI:
+        sources_gui.append("gui/avahi_discover.cpp")
+        sources_engine.append("engine/avahi_register.cpp")
+    sources = sources_engine + sources_engine_shared + sources_gui
+    uselib = ['JACK', 'SNDFILE', 'GTHREAD', 'GMODULE_EXPORT', 'CURL', 'LIBLO',
+              'GTK2', 'GTKMM', 'GIOMM', 'FFTW3', 'LRDF', 'LILV', 'BOOST_SYSTEM','BOOST_IOSTREAMS',
+              'ZITA_CONVOLVER','ZITA_RESAMPLER']
+    if bld.env.HAVE_AVAHI:
+        uselib += ['AVAHI_GOBJECT', 'AVAHI_GLIB', 'AVAHI_CLIENT']
+    if bld.env.HAVE_BLUEZ:
+        uselib.append('BLUEZ')
+    if bld.env.HAVE_PLUGINLIB:
+        uselib += ["plugins"]
+    uselib += ['gxwmm']
+    bld.program(
+        includes = incl,
+        source = sources,
+        use = uselib,
+        target = bld.env.BIN_NAME,
+        chmod = 0o755,
+        install_path = bld.env.BINDIR,
+        ldscript = 'guitarix.lds',
+        mapfile = "guitarix.map",
+        )
+    bld.install_files(bld.env.GX_BUILDER_DIR, builder_files, chmod=0o644)
+    if "RUN_DOXYGEN" in os.environ:
+        # save source file list and include paths for use by doxygen
+        bld(rule="echo ${SRC} > ${TGT}",
+            source = [src for src in sources if not src.endswith('.gperf_tmpl')],
+            target = 'input_gx_head.txt',
+            )
+        bld(rule = "echo ${CPPPATH_ST:INCPATHS} > ${TGT}",
+            features = "use uselib includes",
+            includes = incl,
+            use = uselib,
+            source = "gui/gx_main.cpp",
+            target = 'clang_options.txt',
+            )

@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+# SPDX-License-Identifier: Artistic-2.0
+
+@prefix lv2:      <http://lv2plug.in/ns/lv2core#> .
+@prefix owl:			<http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix props:		<http://open-music-kontrollers.ch/lv2/props#> .
+
+# Orbit Looper
+props:test
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	lv2:binary <props@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <props.ttl> .

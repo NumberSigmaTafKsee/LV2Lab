@@ -1,0 +1,155 @@
+# SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+# SPDX-License-Identifier: Artistic-2.0
+
+@prefix lv2:      <http://lv2plug.in/ns/lv2core#> .
+@prefix owl:			<http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ui:       <http://lv2plug.in/ns/extensions/ui#> .
+@prefix pset:     <http://lv2plug.in/ns/ext/presets#> .
+
+@prefix mephisto:		<http://open-music-kontrollers.ch/lv2/mephisto#> .
+
+# Mephisto Audio 1x1
+mephisto:audio_1x1
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto Audio 2x2
+mephisto:audio_2x2
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto Audio 4x4
+mephisto:audio_4x4
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto Audio 8x8
+mephisto:audio_8x8
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto CV 1x1
+mephisto:cv_1x1
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto CV 2x2
+mephisto:cv_2x2
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto CV 4x4
+mephisto:cv_4x4
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# Mephisto CV 8x8
+mephisto:cv_8x8
+	a lv2:Plugin ;
+	lv2:minorVersion @MINOR_VERSION@ ;
+	lv2:microVersion @MICRO_VERSION@ ;
+	ui:ui mephisto:ui ;
+	lv2:binary <mephisto@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto.ttl> .
+
+# UIs
+mephisto:ui
+	a ui:X11UI ;
+	ui:binary <mephisto_ui@MODULE_SUFFIX@> ;
+	rdfs:seeAlso <mephisto_ui.ttl> .
+
+# Preset banks
+mephisto:bank-filter
+	a pset:Bank ;
+	rdfs:label "Filter bank" .
+mephisto:bank-instrument
+	a pset:Bank ;
+	rdfs:label "Instrument bank" .
+mephisto:bank-time
+	a pset:Bank ;
+	rdfs:label "Time bank" .
+mephisto:bank-analyzer
+	a pset:Bank ;
+	rdfs:label "Analyzer bank" .
+
+# Filter bank
+mephisto:bank-filter_through
+	a pset:Preset ;
+	lv2:appliesTo mephisto:audio_1x1 ,
+		mephisto:audio_2x2 ,
+		mephisto:audio_4x4 ,
+		mephisto:audio_8x8 ;
+	pset:bank mephisto:bank-filter ;
+	rdfs:label "[Filter] Through" ;
+	rdfs:seeAlso <presets.ttl> .
+mephisto:bank-filter_gain
+	a pset:Preset ;
+	lv2:appliesTo mephisto:audio_1x1 ,
+		mephisto:audio_2x2 ,
+		mephisto:audio_4x4 ,
+		mephisto:audio_8x8 ;
+	pset:bank mephisto:bank-filter ;
+	rdfs:label "[Filter] Gain" ;
+	rdfs:seeAlso <presets.ttl> .
+
+# Time bank
+mephisto:bank-time_lfo
+	a pset:Preset ;
+	lv2:appliesTo mephisto:audio_1x1 ,
+		mephisto:audio_2x2 ,
+		mephisto:audio_4x4 ,
+		mephisto:audio_8x8 ;
+	pset:bank mephisto:bank-time ;
+	rdfs:label "[Time] Simple LFO" ;
+	rdfs:seeAlso <presets.ttl> .
+
+# Instrument bank
+mephisto:bank-instrument_osc
+	a pset:Preset ;
+	lv2:appliesTo mephisto:audio_1x1 ,
+		mephisto:audio_2x2 ,
+		mephisto:audio_4x4 ,
+		mephisto:audio_8x8 ;
+	pset:bank mephisto:bank-instrument ;
+	rdfs:label "[Instrument] Simple Oscillator" ;
+	rdfs:seeAlso <presets.ttl> .
+
+# Analyzer bank
+mephisto:bank-analyzer_vu-meter
+	a pset:Preset ;
+	lv2:appliesTo mephisto:audio_1x1 ,
+		mephisto:audio_2x2 ,
+		mephisto:audio_4x4 ,
+		mephisto:audio_8x8 ;
+	pset:bank mephisto:bank-analyzer ;
+	rdfs:label "[Analyzer] VU Meter" ;
+	rdfs:seeAlso <presets.ttl> .

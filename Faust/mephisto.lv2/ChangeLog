@@ -1,0 +1,120 @@
+<!--
+  -- SPDX-FileCopyrightText: Hanspeter Portner <dev@open-music-kontrollers.ch>
+  -- SPDX-License-Identifier: CC0-1.0
+  -->
+# Changelog
+
+## [0.18.2] - 15 Apr 2022
+
+### Fixed
+
+* reuse compliance
+* do not treat warnings as errorsa
+* unit test failures
+
+## [0.18.0] - 15 Apr 2022
+
+### Fixed
+
+* properly parse 14bit MIDI messages
+
+### Added
+
+* support for channel pressure and MPE+ LSB
+* compliance with REUSE spec 3.0
+
+## [0.16.0] - 14 Apr 2021
+
+### Fixed
+
+* license URI in turtle manifest
+* pseudo terminal mouse support discovery
+* EDITOR environment variable parsing
+* termination of spawned processes
+
+### Added
+
+* missing ui:parent feature in turtle manifest
+* cloning of parent environment
+* missing signal header include
+
+### Updated
+
+* to latest pugl
+
+## [0.14.0] - 15 Jan 2021
+
+### Added
+
+* support for host provided file selector
+* support for clipboard copy/paste
+* sending of for state:StateChanged
+* usage of state:freePath
+* support for bargraph properties with acoompanying wave widget
+
+### Changed
+
+* general ui beautification
+* show empty parameter slots
+
+## [0.12.0] - 15 Jul 2020
+
+### Added
+
+* support for bargraphs
+* preset for simple VU meter
+* momentary button ui-widget
+* support for ui:scaleFactor option
+* support for GL double buffering
+
+### Changed
+
+* all ui-widgets to show labels and correct value ranges
+
+## [0.8.0] - 13 Apr 2020
+
+### Fixed
+
+* wrong note frequency at noteOn when pitch bending
+
+### Deprecated
+
+* release duration paramter (voices are always on now)
+
+### Changed
+
+* to build with pugl master
+* to use spinners instead of dials
+* to automagically adapt color theme to terminal colors
+* to count slots from 0 in ui
+
+## [0.6.0] - 15 Jan 2020
+
+### Deprecated
+
+* external UI
+
+### Added
+
+* native UI based on D2TK with embedded terminal emulator
+* retrigger of gate signal over 1 sample at least at NoteOn
+
+### Fixed
+
+* too short error buffer size
+* handling of AllNotesOff and AllSoundsOff MIDI messages
+* compilaton errors (FAUST 2.20.2)
+* slot ordering of parameter slots (FAUST 2.20.2)
+* lv2lint warnings
+
+### Removed
+
+* build dependency on FAUST binary
+
+### Changed
+
+* parameter labels in presets
+
+## [0.2.0] - 13 Oct 2019
+
+### Initial release

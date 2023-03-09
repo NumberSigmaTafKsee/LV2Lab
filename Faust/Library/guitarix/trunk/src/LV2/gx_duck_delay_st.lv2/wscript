@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+import sys, os, ctypes
+
+def configure(conf):
+    pass
+
+def build(bld):
+    lv2_base = 'gx_duck_delay_st'
+
+    bld.lv2(
+        lv2_base = lv2_base,
+        source   = ['gx_duck_delay_st.cpp'],
+        includes = ['../faust','./', '../DSP'],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['LV2CORE','FFTW3'],
+        )
+    bld.lv2_gui(
+        lv2_base = lv2_base,
+        source   = ' gx_duck_delay_st_ui.cpp',
+        includes = ['../xputty/header','../xputty/header/widgets','../xputty/resources','../xputty/lv2_plugin'],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['xcairo','X11', 'CAIRO','LV2CORE'],
+        )

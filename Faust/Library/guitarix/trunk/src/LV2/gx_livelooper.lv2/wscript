@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+def configure(conf):
+    pass
+
+def build(bld):
+    lv2_base = 'gx_livelooper'
+
+    bld.lv2(
+        lv2_base = lv2_base,
+        source   = ['gx_livelooper.cpp'],
+        includes = ['../faust','./', '../DSP'],
+        use = ['LV2CORE','SNDFILE'],
+        )
+    bld.lv2_gui(
+        lv2_base = lv2_base,
+        source   = ' gx_livelooper_ui.cpp',
+        includes = ['../xputty/header','../xputty/header/widgets','../xputty/resources',],
+        cxxflags=['-fvisibility=hidden','-Wl,-z,noexecstack','-Wl,-z,relro,-z,now','-Wl,--exclude-libs,ALL'],
+        use = ['xcairo','X11', 'CAIRO','LV2CORE'],
+        )

@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+import sys, ctypes
+from waflib import TaskGen
+
+def configure(conf):
+    pass
+
+@TaskGen.feature('test_loadable')
+def test_loadable(self):
+    def link_and_test(lib=self.link_task.outputs[0].srcpath(), link=self.link_task.run):
+        link()
+        try:
+            ctypes.cdll.LoadLibrary(lib)
+        except Exception as e:
+            raise RuntimeError("LADSPA load test failed: %s" % e)
+    self.link_task.run = link_and_test
+
+def build(bld):
+    if not bld.env.NEW_LADSPA:
+        return
+
+    src = ['ladspa_guitarix.cpp']
+    incl = ['../headers', '..']
+    lib = []
+    uselib = ['JACK', 'SNDFILE', 'GTHREAD', 'GMODULE_EXPORT',
+              'GLIBMM', 'GIOMM', 'FFTW3', 'BOOST_SYSTEM', 'LILV',
+              'gxwmm_inc']
+    ladspa_plugin = bld.shlib(
+        features='test_loadable',
+        includes = incl,
+        lib = lib,
+        use = uselib+['shared_engine','shared_plugins'],
+        cxxflags = ["-fvisibility=hidden"],
+        defines = ["LADSPA_SO"],
+        target   = 'ladspa_guitarix',
+        source   = src,
+        install_path = '${LADSPADIR}',
+        chmod = 0o755,
+        )
+    ladspa_plugin.env.cxxshlib_PATTERN = '%s.so'
+    bld.install_files('${SHAREDIR}/ladspa/rdf', 'guitarix_amp.rdf')
