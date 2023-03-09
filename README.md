@@ -25,7 +25,8 @@
 * DspFilters/
 * Spuce/
 * Kfr/
-* Reverb/Synthesizer/
+* Reverb/
+* Synthesizer/
 * AMSynth voice
 * AudioFFT
 * AudioSystem
