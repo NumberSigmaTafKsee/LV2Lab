@@ -14,6 +14,11 @@
 # lv2load.lua
 * This experimental for loading and testing the lv2 plugins with lua
 
+# The GUI is sold seperately
+* There is no end to the options you can use for it
+* This is only the glue to connect the audio/midi to the interpreters
+
+
 # I am thinning it out now
 * I am removing the unncessary kaka
 * It is all in other place
