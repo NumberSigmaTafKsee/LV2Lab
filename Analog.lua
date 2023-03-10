@@ -91,6 +91,10 @@ function control(c,d1,d2)
     end
 end
 
+-- app callback, midi handling and logic
+-- isAudioRunning shuld be atomic
+-- either block audio or wait until finished
+-- this is run every 10ms, or can be changed in portaudio.i
 function callback()
     print('hi')
 end 
@@ -123,7 +127,7 @@ for i=0,audiosystem.GetNumMidiDevices()-1 do
 end
 
 audiosystem.set_audio_func(noise)
-
+--audiosystem.set_callback_func(callback)
 device=14
 audiosystem.Pa_Initialize()
 for i=0,audiosystem.GetNumAudioDevices()-1 do 

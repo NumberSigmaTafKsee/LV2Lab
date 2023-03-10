@@ -11,7 +11,7 @@
 
 #include "LuaJIT.hpp"
 
-Lua::LuaJIT interpreter("lv2.lua");
+
 
 struct Urids
 {
@@ -28,14 +28,16 @@ struct LV2Lua
     LV2_URID_Map* map ;
     Urids urids;
     double rate;
-    
+	Lua::LuaJIT interpreter;
+	
     LV2Lua(const double sampleRate, const LV2_Feature *const *features) :    
     midi_in_ptr (nullptr),
     midi_out_ptr (nullptr),
     audio_in_ptr (nullptr),    
     audio_out_ptr (nullptr),    
     map (nullptr),
-    rate (sampleRate)
+    rate (sampleRate),
+    interpreter("lv2.lua")
     {
 		const char* missing = lv2_features_query
 		(
@@ -55,6 +57,7 @@ struct LV2Lua
 /* internal core methods */
 static LV2_Handle instantiate (const struct LV2_Descriptor *descriptor, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {    
+	std::cout << "LV2Luajit Instantiated" << std::endl;
     LV2Lua *m = new LV2Lua(sample_rate, features);
     return m;
 }
@@ -113,38 +116,44 @@ static void run (LV2_Handle instance, uint32_t sample_count)
 {
     LV2Lua* m = (LV2Lua*) instance;
     if (!m) return;
-    
+    Lua::LuaJIT &interpreter = m->interpreter;
+    uint32_t last_frame = 0;
     /* analyze incomming MIDI data */    
     LV2_ATOM_SEQUENCE_FOREACH (m->midi_in_ptr, ev)
     {
         /* play frames until event */
-        const uint32_t frame = ev->time.frames;
-        
+        const uint32_t frame = ev->time.frames;        
+		last_frame = frame;
+		
         if (ev->body.type == m->urids.midi_MidiEvent)
         {
             const uint8_t* const msg = reinterpret_cast<const uint8_t*> (ev + 1);
             const uint8_t typ = lv2_midi_message_type (msg);
-
+			printf("MIDI Msg %d %d\n",msg[0],msg[1]);
             switch (typ)
             {
-            case LV2_MIDI_MSG_NOTE_ON:            
-                interpreter.PushNumber(msg[0]);
+            case LV2_MIDI_MSG_NOTE_ON:            				
+				interpreter.GetGlobal("note_on");
+				interpreter.PushNumber(0);
                 interpreter.PushNumber(msg[1]);
-                interpreter.PushNumber(msg[2]);
-                interpreter.Call("note_on");                
+				interpreter.PushNumber(msg[2]);				                
+                interpreter.pcall(3,0);                                
                 break;
 
-            case LV2_MIDI_MSG_NOTE_OFF:                
+            case LV2_MIDI_MSG_NOTE_OFF:   
+				interpreter.GetGlobal("note_off");
+				interpreter.PushNumber(0);
                 interpreter.PushNumber(msg[1]);
-                interpreter.PushNumber(msg[2]);
-                interpreter.Call("note_off");                
+				interpreter.PushNumber(msg[2]);				                
+                interpreter.pcall(3,0);                                
                 break;
 
             case LV2_MIDI_MSG_CONTROLLER:
-                interpreter.PushNumber(msg[0]);
+                interpreter.GetGlobal("control");
+                interpreter.PushNumber(0);
                 interpreter.PushNumber(msg[1]);
-                interpreter.PushNumber(msg[2]);
-                interpreter.Call("control");                
+				interpreter.PushNumber(msg[2]);				                
+                interpreter.pcall(3,0);                                
                 break;
             
             default:
@@ -154,11 +163,11 @@ static void run (LV2_Handle instance, uint32_t sample_count)
     }
 
 	// run the audio code
+	interpreter.GetGlobal("noise");
     interpreter.PushLightUserData(m->audio_in_ptr);
     interpreter.PushLightUserData(m->audio_out_ptr);
     interpreter.PushNumber(sample_count);
-    interpreter.Call("noise");
-    
+    interpreter.pcall(3,0);    
 }
 
 static void deactivate (LV2_Handle instance)

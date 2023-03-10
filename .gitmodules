@@ -76,3 +76,6 @@
 [submodule "XPlugs.lv2"]
 	path = XPlugs.lv2
 	url = https://github.com/brummer10/XPlugs.lv2
+[submodule "ingen"]
+	path = ingen
+	url = https://github.com/drobilla/ingen

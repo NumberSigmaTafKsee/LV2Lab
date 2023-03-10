@@ -1,5 +1,6 @@
 %module AudioTK
 %{
+#define DSPFLOATDOUBLE
 #include "SoundObject.hpp"
 
 #include <cassert>
@@ -75,6 +76,7 @@
 %include "std_map.i"
 %include "lua_fnptr.i"
 
+#define DSPFLOATDOUBLE
 %include "SoundObject.hpp"
 
 %include "AudioTK/ATK.hpp"
@@ -86,6 +88,7 @@
 %include "AudioTK/ATKChamberlinFilter.hpp"
 %include "AudioTK/ATKChebyshev1Filter.hpp"
 %include "AudioTK/ATKChebyshev2Filter.hpp"
+%include "AudioTK/ATKDistortionProcessors.hpp"
 %include "AudioTK/ATKExpander.hpp"
 %include "AudioTK/ATKFeedbackDelayNetwork.hpp"
 %include "AudioTK/ATKFIRFilter.hpp"

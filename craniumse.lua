@@ -55,15 +55,6 @@ function matrix_copyValuesInto(from,to)
     return to 
 end 
 
-function clamp(m)
-    for i=0,m:rows()-1 do
-        for j=0,m:cols()-1 do
-            if(m:get(i,j) < 0) then m:set(i,j,0) end
-            if(m:get(i,j) > 1) then m:set(i,j,1) end
-        end
-    end
-end
-
 function matrix_printMatrix(input)
     for i=0,input:rows()-1 do
         print() 
@@ -605,8 +596,7 @@ function batchGradientDescent(network,data,classes,lossFunction, batchSize, lear
                     local to = network.layers[layer]                                        
                     local con = network.connections[layer-1]
                     if(layer == network.numLayers-1) then                                                                                                                          
-                        --errori[layer] = to.input - target                                                                           
-                        errori[layer] = p.loss(to.input,target)
+                        errori[layer] = to.input - target                                                                           
                         con.from.input:transposeInto(beforeOutputT)                                                                                                    
                         dWi[layer-1] = beforeOutputT * errori[layer]       
                         dbi[layer-1] = errori[layer]:eval()                                                                           
@@ -727,51 +717,9 @@ function test()
 end
 
 
-function Line(f)
-    local y = 0.25
-    examples = { {y} }
-    training = { {y} }
-    
-    e = matrix_new(1,1,examples,true)
-    t = matrix_new(1,1,training,true)
-    net = network_new(1,1,{3},{f},1,LINEAR)
-    p = parameterset_new(net,e,t,LOSS,1,0.1,0,1e-6,0.9,1000,false,true)
-    p.verbose=true
-    p.batchSize=1
-    p.searchTime = 0 
-    p.regularizationStrength = 0
-    p.learningRate = 0.1
-    p.momentumFactor = 0.9
-    p.shuffle = false
-    -- loss = eval(w) - target
-    p.loss = function(i,t) 
-        local x = i:eval()        
-        local m = net.connections[1].weights
-        clamp(m)
-        local y = m:get(0,0)*m:get(1,0)+m:get(2,0)        
-        x:set(0,0,y)
-        return x-t
-    end
-    print("CraniumSE Online")
-    if(use_profiler == true) then profiler.start() end 
-    net:optimize(p)
-    print("READY")
-    if(use_profile == true) then 
-        profiler.stop() 
-        profiler.report("cranium5.log")
-    end
-    net:forwardPassDataSet(e)
-    output = net:getOutput()
-    print(net.total_loss)
-    
-    local m = net.connections[1].weights             
-    print(m:get(0,0)*m:get(1,0)+m:get(2,0))
-    print()    
-end
 
-Line(tanh)
 --test()
---XOR(sigmoid)
---XOR(tanH)
---XOR(relu)
---os.exit()
+XOR(sigmoid)
+XOR(tanH)
+XOR(relu)
+os.exit()
