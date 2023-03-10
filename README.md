@@ -17,6 +17,7 @@
 # The GUI is sold seperately
 * There is no end to the options you can use for it
 * This is only the glue to connect the audio/midi to the interpreters
+* You can even use Juce if you connect it to the audio/midi ports
 
 
 # I am thinning it out now
