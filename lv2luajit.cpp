@@ -2,60 +2,21 @@
 #include "stddef.h"
 #include "stdint.h"
 #include "stdlib.h"
-//#include "math.h"
 #include "lv2.h"
+#include <lv2/atom/atom.h>
+#include <lv2/urid/urid.h>
+#include <lv2/midi/midi.h>
+#include <lv2/core/lv2_util.h>
+#include <lv2/atom/util.h>
 
 #include "LuaJIT.hpp"
 
 Lua::LuaJIT interpreter("lv2.lua");
 
-
-template <class T>
-class LinearFader
+struct Urids
 {
-private:
-    T destination_;
-    uint32_t distance_;
-    T value_;
-
-public:
-    LinearFader (const T destination) :
-        destination_ (destination),
-        distance_ (0),
-        value_ (destination)
-    {
-
-    }
-
-    void set (const T destination, const uint32_t distance)
-    {
-        destination_ = destination;
-        distance_ = distance;
-        if (distance == 0) value_ = destination;
-    }
-
-    T get () const
-    {
-        return value_;
-    }
-
-    void proceed ()
-    {
-        if (distance_ == 0) value_ = destination_;
-        else
-        {
-            value_ += (destination_ - value_) * (1.0 / static_cast<double> (distance_));
-            distance_ -= 1;
-        }
-    }
+    LV2_URID midi_MidiEvent;
 };
-
-template <class T>
-T limit (const T x, const T min, const T max)
-{
-    return (x < min ? min : (x > max ? max : x));
-}
-
 
 /* class definition */
 struct LV2Lua
@@ -68,12 +29,13 @@ struct LV2Lua
     Urids urids;
     double rate;
     
-    LV2Lua(const double sampleRate, const LV2_Feature *const features) :    
+    LV2Lua(const double sampleRate, const LV2_Feature *const *features) :    
     midi_in_ptr (nullptr),
-    audio_out_ptr (nullptr),
-    controlLevel (0.0f),
+    midi_out_ptr (nullptr),
+    audio_in_ptr (nullptr),    
+    audio_out_ptr (nullptr),    
     map (nullptr),
-    rate (sample_rate),
+    rate (sampleRate)
     {
 		const char* missing = lv2_features_query
 		(
@@ -109,7 +71,7 @@ enum PortGroups
 
 static void connect_port (LV2_Handle instance, uint32_t port, void *data_location)
 {
-    MyAmp* m = (MyAmp*) instance;
+    LV2Lua* m = (LV2Lua*) instance;
     if (!m) return;
 
     switch (port)
@@ -123,11 +85,11 @@ static void connect_port (LV2_Handle instance, uint32_t port, void *data_locatio
         break;
 
     case PORT_MIDI_OUT:
-		midi_out_ptr = static_cast<const LV2_Atom_Sequence*> (data_location);
+		m->midi_out_ptr = static_cast<const LV2_Atom_Sequence*> (data_location);
 		break;
 		
     case PORT_MIDI_IN:
-        midi_in_ptr = static_cast<const LV2_Atom_Sequence*> (data_location);
+        m->midi_in_ptr = static_cast<const LV2_Atom_Sequence*> (data_location);
         break;
 
 	case PORT_CONTROL:
@@ -152,16 +114,13 @@ static void run (LV2_Handle instance, uint32_t sample_count)
     LV2Lua* m = (LV2Lua*) instance;
     if (!m) return;
     
-    /* analyze incomming MIDI data */
-    uint32_t last_frame = 0;
+    /* analyze incomming MIDI data */    
     LV2_ATOM_SEQUENCE_FOREACH (m->midi_in_ptr, ev)
     {
         /* play frames until event */
         const uint32_t frame = ev->time.frames;
-        play (last_frame, frame);
-        last_frame = frame;
-
-        if (ev->body.type == urids.midi_MidiEvent)
+        
+        if (ev->body.type == m->urids.midi_MidiEvent)
         {
             const uint8_t* const msg = reinterpret_cast<const uint8_t*> (ev + 1);
             const uint8_t typ = lv2_midi_message_type (msg);
@@ -197,7 +156,7 @@ static void run (LV2_Handle instance, uint32_t sample_count)
 	// run the audio code
     interpreter.PushLightUserData(m->audio_in_ptr);
     interpreter.PushLightUserData(m->audio_out_ptr);
-    interpreter.PushLightUserData(sample_count);
+    interpreter.PushNumber(sample_count);
     interpreter.Call("noise");
     
 }
@@ -232,7 +191,7 @@ static LV2_Descriptor const descriptor =
 };
 
 /* interface */
-const LV2_SYMBOL_EXPORT LV2_Descriptor* lv2_descriptor (uint32_t index)
+LV2_SYMBOL_EXPORT const LV2_Descriptor* lv2_descriptor (uint32_t index)
 {
     if (index == 0) return &descriptor;
     else return NULL;
