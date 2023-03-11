@@ -1,7 +1,11 @@
 /* include libs */
-#include "stddef.h"
-#include "stdint.h"
-#include "stdlib.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <vector>
+#include <array>
+#include <string>
+
 #include "lv2.h"
 #include <lv2/atom/atom.h>
 #include <lv2/urid/urid.h>
@@ -12,6 +16,7 @@
 #include "LuaJIT.hpp"
 
 
+std::string bundlepath;
 
 struct Urids
 {
@@ -30,14 +35,14 @@ struct LV2Lua
     double rate;
 	Lua::LuaJIT interpreter;
 	
-    LV2Lua(const double sampleRate, const LV2_Feature *const *features) :    
+    LV2Lua(const std::string& path, const double sampleRate, const LV2_Feature *const *features) :    
     midi_in_ptr (nullptr),
     midi_out_ptr (nullptr),
     audio_in_ptr (nullptr),    
     audio_out_ptr (nullptr),    
     map (nullptr),
     rate (sampleRate),
-    interpreter("lv2.lua")
+    interpreter((path +"/lv2.lua").c_str())
     {
 		const char* missing = lv2_features_query
 		(
@@ -58,7 +63,8 @@ struct LV2Lua
 static LV2_Handle instantiate (const struct LV2_Descriptor *descriptor, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {    
 	std::cout << "LV2Luajit Instantiated" << std::endl;
-    LV2Lua *m = new LV2Lua(sample_rate, features);
+    LV2Lua *m = new LV2Lua(bundle_path,sample_rate, features);
+    bundlepath = bundle_path;
     return m;
 }
 
