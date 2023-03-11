@@ -1,10 +1,15 @@
 # LV2Lab
 
-# It is working
-* Which is cool
+# I do believe it is working
+* Good
+* That'll keep us going for the show
 
-# not working very well
-* kind of expected as I just started on it today
+# There are many things unknown
+* I have only finally decided 
 
-# It uses alot of CPU
-* Hopefully that can be fixed later when it is working correctly first
+# Now, the script
+* where does it go
+* I put it in the bundle path for the moment as I know where it is
+* Maybe, make a directroy in the home for them or something
+
+
