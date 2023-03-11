@@ -13,3 +13,8 @@
 * Maybe, make a directroy in the home for them or something
 
 
+# This makes doing audio research alot easier
+* Already exist good host like Carla or Endo
+* Rolling down the street sipping on gin and juice, pffn on that endo
+* Yeah hah
+
