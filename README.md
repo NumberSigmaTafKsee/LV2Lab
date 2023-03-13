@@ -17,3 +17,23 @@ The Theory of Scriptable Audio
 * Kfr DSP
 * Neo10 (arm)
 
+# AudioDSP interface
+* Amplifiers
+* Analog
+* FX
+* Filters
+* Synthesizers
+* Faust
+* StdSamples
+* AudioDSP
+* Audio
+* CAnalog
+* FXObjects
+* Stk
+* Gamma
+* Loris
+* DSP
+* Core
+* FM
+* Reverbs
+
