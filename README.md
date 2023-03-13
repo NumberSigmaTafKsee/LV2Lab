@@ -6,6 +6,10 @@ The Theory of Scriptable Audio
 * GNU Octave
 * Python
 
+# You can make anything you want
+* You can use it for special purpose
+* You can use it to test dsp ideas quickly
+
 # Codes
 * FXDSP
 * Loudia
